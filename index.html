@@ -234,37 +234,67 @@
                 terrainSpeed: 2
             };
     
-            let keys = {};
-            document.addEventListener("keydown", (e) => keys[e.code] = true);
-            document.addEventListener("keyup", (e) => keys[e.code] = false);
-    
-            document.getElementById("leftBtn").addEventListener("mousedown", () => keys["ArrowLeft"] = true);
-            document.getElementById("leftBtn").addEventListener("mouseup", () => keys["ArrowLeft"] = false);
-            document.getElementById("rightBtn").addEventListener("mousedown", () => keys["ArrowRight"] = true);
-            document.getElementById("rightBtn").addEventListener("mouseup", () => keys["ArrowRight"] = false);
-    
-            function update() {
-                if (keys["ArrowRight"]) car.speed += 0.1;
-                if (keys["ArrowLeft"]) car.speed -= 0.005;
-                car.speed *= 0.98;
-                car.y += car.gravity - car.lift;
-                car.lift *= 0.9;
-                
-                let groundY = getGroundY(car.x);
-                if (car.y >= groundY - car.height) {
-                    car.y = groundY - car.height;
-                    car.lift = 0;
-                }
-    
-                terrain.forEach(point => point.x -= car.speed);
-                if (terrain[0].x < -terrainWidth) {
-                    terrain.shift();
-                    let lastX = terrain[terrain.length - 1].x;
-                    let newY = terrain[terrain.length - 1].y + (Math.random() * 50 - 25);
-                    newY = Math.max(minHeight, Math.min(canvas.height - maxHeight, newY));
-                    terrain.push({ x: lastX + terrainWidth, y: newY });
-                }
-            }
+            let keys = {};  // Track key states (for PC controls)
+
+// PC Key Event Listeners (For Arrow keys)
+document.addEventListener("keydown", (e) => keys[e.code] = true);
+document.addEventListener("keyup", (e) => keys[e.code] = false);
+
+// Mobile Button Event Listeners (For left and right buttons)
+document.getElementById("leftBtn").addEventListener("mousedown", () => keys["ArrowLeft"] = true);
+document.getElementById("leftBtn").addEventListener("mouseup", () => keys["ArrowLeft"] = false);
+document.getElementById("rightBtn").addEventListener("mousedown", () => keys["ArrowRight"] = true);
+document.getElementById("rightBtn").addEventListener("mouseup", () => keys["ArrowRight"] = false);
+
+// Update car movement
+function update() {
+    // Check if right arrow key or right button is pressed
+    if (keys["ArrowRight"]) {
+        car.speed += 0.1;  // Increase speed
+    }
+
+    // Check if left arrow key or left button is pressed
+    if (keys["ArrowLeft"]) {
+        car.speed -= 0.005;  // Decrease speed slightly for control
+    }
+
+    // Apply drag or friction to car speed to simulate smooth motion
+    car.speed *= 0.98;
+
+    // Apply gravity and lift for car's vertical movement
+    car.y += car.gravity - car.lift;
+    car.lift *= 0.9;  // Slow down lift over time for smoother motion
+
+    // Ensure car stays on the ground
+    let groundY = getGroundY(car.x);
+    if (car.y >= groundY - car.height) {
+        car.y = groundY - car.height;
+        car.lift = 0;  // Stop lift when the car hits the ground
+    }
+
+    // Update terrain movement
+    terrain.forEach(point => point.x -= car.speed);  // Move terrain to the left
+    if (terrain[0].x < -terrainWidth) {
+        terrain.shift();  // Remove the first terrain point
+        let lastX = terrain[terrain.length - 1].x;  // Get last terrain's X position
+        let newY = terrain[terrain.length - 1].y + (Math.random() * 50 - 25);  // Random height for new terrain point
+        newY = Math.max(minHeight, Math.min(canvas.height - maxHeight, newY));  // Clamp to canvas bounds
+        terrain.push({ x: lastX + terrainWidth, y: newY });  // Add new terrain point
+    }
+}
+
+// Example function to return the ground's Y position at the car's X position
+function getGroundY(x) {
+    // Assuming terrain is a set of points representing ground's Y coordinates
+    // This function should return the Y position based on the car's X position
+    for (let i = 0; i < terrain.length; i++) {
+        if (x >= terrain[i].x && x <= terrain[i + 1].x) {
+            return terrain[i].y;
+        }
+    }
+    return canvas.height;  // Default to bottom of canvas if no match found
+}
+
     
             function getGroundY(x) {
                 for (let i = 0; i < terrain.length - 1; i++) {
