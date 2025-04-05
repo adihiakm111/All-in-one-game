@@ -234,17 +234,50 @@
                 terrainSpeed: 2
             };
     
-            let keys = {};  // Track key states (for PC controls)
 
-// PC Key Event Listeners (For Arrow keys)
-document.addEventListener("keydown", (e) => keys[e.code] = true);
-document.addEventListener("keyup", (e) => keys[e.code] = false);
 
-// Mobile Button Event Listeners (For left and right buttons)
-document.getElementById("leftBtn").addEventListener("mousedown", () => keys["ArrowLeft"] = true);
-document.getElementById("leftBtn").addEventListener("mouseup", () => keys["ArrowLeft"] = false);
-document.getElementById("rightBtn").addEventListener("mousedown", () => keys["ArrowRight"] = true);
-document.getElementById("rightBtn").addEventListener("mouseup", () => keys["ArrowRight"] = false);
+// ------------------------------
+// Key Object (Global)
+const keys = {};
+
+// ------------------------------
+// PC Key Event Listeners (Arrow keys)
+document.addEventListener("keydown", (e) => {
+    keys[e.code] = true;
+});
+
+document.addEventListener("keyup", (e) => {
+    keys[e.code] = false;
+});
+
+// ------------------------------
+// Mobile Button Event Listeners (Left & Right Touch Buttons)
+const leftBtn = document.getElementById("leftBtn");
+const rightBtn = document.getElementById("rightBtn");
+
+// LEFT Button (Touch + Mouse)
+leftBtn.addEventListener("mousedown", () => keys["ArrowLeft"] = true);
+leftBtn.addEventListener("mouseup", () => keys["ArrowLeft"] = false);
+leftBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault(); // prevent scrolling
+    keys["ArrowLeft"] = true;
+});
+leftBtn.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    keys["ArrowLeft"] = false;
+});
+
+// RIGHT Button (Touch + Mouse)
+rightBtn.addEventListener("mousedown", () => keys["ArrowRight"] = true);
+rightBtn.addEventListener("mouseup", () => keys["ArrowRight"] = false);
+rightBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    keys["ArrowRight"] = true;
+});
+rightBtn.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    keys["ArrowRight"] = false;
+});
 
 // Update car movement
 function update() {
